@@ -22,6 +22,11 @@ version: 2.1
     keys:
       - bundler-dependencies-{{ checksum "current_gemfile.lock" }}-{{ .Environment.CIRCLE_JOB }}
 
+.install_uncached_dependencies: &install_uncached_dependencies
+  run:
+    name: Install uncached dependencies
+    command: bundle install --retry 3 --jobs 3
+
 .install_dependencies: &install_dependencies
   run:
     name: Install dependencies
@@ -217,9 +222,7 @@ jobs:
       - *install_rubygems
       - *install_bundler
       - *copy_current_gemfile
-      - *restore_cache
-      - *install_dependencies
-      - *save_cache
+      - *install_uncached_dependencies
       - *generate_docs
       - *restore_coverage
       - *run_lints
